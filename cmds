@@ -1,0 +1,33 @@
+docker run -p 8000:8000 paymentjava
+
+docker save -o paymentjava.tar paymentjavas:latest
+scp paymentjava-amd64.tar clement@infinity.nla-fidelity.org:/home/clement/
+docker load -i paymentjava-amd64.tar
+
+
+docker buildx create --use
+
+docker buildx build --platform linux/amd64 -t paymentjava:latest . --load
+docker buildx build --platform linux/amd64 -t apps:4.0.0 -f Dockerfile .
+docker buildx build --platform linux/amd64 -t paymentjava:latest .
+luckcreators
+
+
+docker run --name paymentdb-postgres \
+  -e POSTGRES_USER=luckcreators \
+  -e POSTGRES_PASSWORD=luckcreators \
+  -e POSTGRES_DB=paymentdb \
+  -p 5432:5432 \
+  -d postgres:16
+
+
+
+docker run -d \
+  --name paymentdb-postgres \
+  -e POSTGRES_PASSWORD=luckcreators \
+  -p 5432:5432 \
+  postgres:16
+
+
+docker run -d --name paymentjava-v2 -p 8000:8000 paymentjava:latest
+docker logs -f paymentjava
